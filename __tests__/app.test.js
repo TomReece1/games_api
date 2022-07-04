@@ -18,14 +18,18 @@ describe("app", () => {
           .get("/api/categories")
           .expect(200)
           .then(({ body }) => {
-            body.categories.forEach((category) =>
-              expect(category).toEqual(
-                expect.objectContaining({
-                  slug: expect.any(String),
-                  description: expect.any(String),
-                })
-              )
-            );
+            if (body.categories.length > 0) {
+              body.categories.forEach((category) =>
+                expect(category).toEqual(
+                  expect.objectContaining({
+                    slug: expect.any(String),
+                    description: expect.any(String),
+                  })
+                )
+              );
+            } else {
+              expect(body.categories).toEqual([]);
+            }
           });
       });
     });
@@ -156,16 +160,19 @@ describe("app", () => {
           .get("/api/users")
           .expect(200)
           .then(({ body }) => {
-            console.log(body);
-            body.users.forEach((user) =>
-              expect(user).toEqual(
-                expect.objectContaining({
-                  username: expect.any(String),
-                  name: expect.any(String),
-                  avatar_url: expect.any(String),
-                })
-              )
-            );
+            if (body.users.length > 0) {
+              body.users.forEach((user) =>
+                expect(user).toEqual(
+                  expect.objectContaining({
+                    username: expect.any(String),
+                    name: expect.any(String),
+                    avatar_url: expect.any(String),
+                  })
+                )
+              );
+            } else {
+              expect(body.users).toEqual([]);
+            }
           });
       });
     });
