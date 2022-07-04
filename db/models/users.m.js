@@ -8,6 +8,7 @@ exports.fetchUsers = () => {
   `
     )
     .then((results) => {
+      console.log(results);
       return results.rows;
     });
 };
