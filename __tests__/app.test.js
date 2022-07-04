@@ -30,4 +30,16 @@ describe.only("app", () => {
         });
     });
   });
+
+  describe("Misspelled endpoints receive 404", () => {
+    test("Misspelled endpoints receive 404", () => {
+      return request(app)
+        .get("/api/categoriez")
+        .expect(404)
+        .then(({ body }) => {
+          console.log(body.msg, "<<--body.msg");
+          expect(body.msg).toBe("Invalid Path");
+        });
+    });
+  });
 });
