@@ -18,14 +18,18 @@ describe("app", () => {
           .get("/api/categories")
           .expect(200)
           .then(({ body }) => {
-            body.categories.forEach((category) =>
-              expect(category).toEqual(
-                expect.objectContaining({
-                  slug: expect.any(String),
-                  description: expect.any(String),
-                })
-              )
-            );
+            if (body.categories.length > 0) {
+              body.categories.forEach((category) =>
+                expect(category).toEqual(
+                  expect.objectContaining({
+                    slug: expect.any(String),
+                    description: expect.any(String),
+                  })
+                )
+              );
+            } else {
+              expect(body.categories).toEqual([]);
+            }
           });
       });
     });
@@ -144,6 +148,31 @@ describe("app", () => {
             expect(body.msg).toBe(
               "something wrong with the request information provided"
             );
+          });
+      });
+    });
+  });
+
+  describe("users", () => {
+    describe("GET /api/users", () => {
+      test("status:200 and returns an object with key users and a value of an array of user objects", () => {
+        return request(app)
+          .get("/api/users")
+          .expect(200)
+          .then(({ body }) => {
+            if (body.users.length > 0) {
+              body.users.forEach((user) =>
+                expect(user).toEqual(
+                  expect.objectContaining({
+                    username: expect.any(String),
+                    name: expect.any(String),
+                    avatar_url: expect.any(String),
+                  })
+                )
+              );
+            } else {
+              expect(body.users).toEqual([]);
+            }
           });
       });
     });
