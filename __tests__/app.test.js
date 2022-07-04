@@ -149,6 +149,28 @@ describe("app", () => {
     });
   });
 
+  describe("users", () => {
+    describe.only("GET /api/users", () => {
+      test("status:200 and returns an object with key users and a value of an array of user objects", () => {
+        return request(app)
+          .get("/api/users")
+          .expect(200)
+          .then(({ body }) => {
+            console.log(body);
+            body.users.forEach((user) =>
+              expect(user).toEqual(
+                expect.objectContaining({
+                  username: expect.any(String),
+                  name: expect.any(String),
+                  avatar_url: expect.any(String),
+                })
+              )
+            );
+          });
+      });
+    });
+  });
+
   describe("General error handling", () => {
     test("Misspelled endpoints receive 404", () => {
       return request(app)
