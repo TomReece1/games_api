@@ -71,6 +71,82 @@ describe("app", () => {
           });
       });
     });
+
+    describe("PATCH /api/reviews/:review_id", () => {
+      const goodReqBody = {
+        inc_votes: 2,
+      };
+      const badReqBody1 = {
+        inc_votes: "wrong_type",
+      };
+      const badReqBody2 = {
+        wrong_var_name: 1,
+      };
+      test("status:200 when requested review_id and req body are valid", () => {
+        return request(app)
+          .patch("/api/reviews/1")
+          .send(goodReqBody)
+          .expect(200)
+          .then(({ body: { review } }) => {
+            expect(review).toEqual({
+              review_id: 1,
+              title: "Agricola",
+              category: "euro game",
+              designer: "Uwe Rosenberg",
+              owner: "mallionaire",
+              review_body: "Farmyard fun!",
+              review_img_url:
+                "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+              created_at: "2021-01-18T10:00:20.514Z",
+              votes: 3,
+            });
+          });
+      });
+
+      test("status:404 when requested review_id is a number but doesn't exist", () => {
+        return request(app)
+          .patch("/api/reviews/999")
+          .send(goodReqBody)
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("review number 999 does not exist");
+          });
+      });
+
+      test("status:400 when requested review_id is not of type number", () => {
+        return request(app)
+          .patch("/api/reviews/invalid")
+          .send(goodReqBody)
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("review_id must be a number");
+          });
+      });
+
+      test("status:422 when request body has wrong type", () => {
+        return request(app)
+          .patch("/api/reviews/1")
+          .send(badReqBody1)
+          .expect(422)
+          .then(({ body }) => {
+            expect(body.msg).toBe(
+              "something wrong with the request information provided"
+            );
+          });
+      });
+
+      test("status:422 when request body has wrong var name", () => {
+        return request(app)
+          .patch("/api/reviews/1")
+          .send(badReqBody2)
+          .expect(422)
+          .then(({ body }) => {
+            expect(body.msg).toBe(
+              "something wrong with the request information provided"
+            );
+          });
+      });
+    });
   });
 
   describe("General error handling", () => {
