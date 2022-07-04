@@ -7,6 +7,8 @@ app.use(express.json());
 
 app.get("/api/categories", getCategories);
 
+app.get("/api/reviews/:review_id", getReviewById);
+
 app.use("*", (req, res) => {
   console.log("in 404 handler");
   res.status(404).send({ msg: "Invalid Path" });
