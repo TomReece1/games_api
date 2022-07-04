@@ -150,7 +150,7 @@ describe("app", () => {
   });
 
   describe("users", () => {
-    describe.only("GET /api/users", () => {
+    describe("GET /api/users", () => {
       test("status:200 and returns an object with key users and a value of an array of user objects", () => {
         return request(app)
           .get("/api/users")
