@@ -277,6 +277,31 @@ describe("app", () => {
           });
       });
 
+      test("status:201 length of comments table becomes 1 more", () => {
+        let startingComments = undefined;
+        let finalComments = undefined;
+
+        return request(app)
+          .get("/api/reviews/2/comments")
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            startingComments = comments.length;
+            return request(app)
+              .post("/api/reviews/2/comments")
+              .send(validReqBody)
+              .expect(201)
+              .then(() => {
+                return request(app)
+                  .get("/api/reviews/2/comments")
+                  .expect(200)
+                  .then(({ body: { comments } }) => {
+                    finalComments = comments.length;
+                    expect(finalComments).toBe(startingComments + 1);
+                  });
+              });
+          });
+      });
+
       test("status:404 when review_id is a number that doesn't exist", () => {
         return request(app)
           .post("/api/reviews/999/comments")
