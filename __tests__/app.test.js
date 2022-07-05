@@ -189,7 +189,7 @@ describe("app", () => {
       });
     });
 
-    describe.only("GET /api/reviews/:review_id/comments", () => {
+    describe("GET /api/reviews/:review_id/comments", () => {
       test("status:200 returns array of comment objects when passed a valid review_id with at least 1 comment", () => {
         return request(app)
           .get("/api/reviews/2/comments")
