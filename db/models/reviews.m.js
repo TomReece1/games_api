@@ -67,17 +67,72 @@ exports.updateReviewById = (review_id, inc_votes) => {
     });
 };
 
-exports.fetchReviews = () => {
+exports.fetchReviews = (sort_by = "created_at", order = "desc", category) => {
+  const validSortOptions = [
+    "review_id",
+    "title",
+    "category",
+    "designer",
+    "owner",
+    "review_body",
+    "review_img_url",
+    "created_at",
+    "votes",
+  ];
+
+  const validOrderOptions = ["asc", "desc"];
+
+  //This will have to be changed later, what if lots more categories are added later?
+  //Can't remember what the solution was but it will be in my notes
+  //How else could we validate a string to see if it exist on the category column
+  //A util function? we already made a function that checks if review_id exists
+  //Make another function that checks if category exists
+  const validCategoryOptions = [undefined, "dexterity", "social deduction"];
+
+  if (!validSortOptions.includes(sort_by)) {
+    return Promise.reject({
+      status: 400,
+      errorMessage: "Invalid sort_by query",
+    });
+  }
+  if (!validOrderOptions.includes(order)) {
+    return Promise.reject({ status: 400, errorMessage: "Invalid order query" });
+  }
+  if (!validCategoryOptions.includes(category)) {
+    return Promise.reject({
+      status: 400,
+      errorMessage: "Invalid category query",
+    });
+  }
+
+  let whereStr = "";
+  if (category) {
+    whereStr = `WHERE reviews.category = '${category}'`;
+  }
+
+  // console.log("this.checkCategoryExists(category)");
+  // console.log(this.checkCategoryExists(category));
+  // return this.checkCategoryExists(category).then(
+
+  // if (category && !this.checkCategoryExists(category)) {
+  //   return Promise.reject({
+  //     status: 400,
+  //     errorMessage: "Invalid category query",
+  //   });
+  // }
+
   return connection
     .query(
       `
       SELECT reviews.*, count(comments.body) AS comment_count FROM reviews
       LEFT JOIN comments ON reviews.review_id = comments.review_id
+      ${whereStr}
       GROUP BY reviews.review_id
-      ORDER BY reviews.created_at desc;
+      ORDER BY reviews.${sort_by} ${order};
   `
     )
     .then(({ rows }) => {
+      console.log("query worked");
       return rows;
     });
 };
@@ -157,6 +212,28 @@ exports.checkReviewExists = (review_id) => {
       return Promise.reject({
         status: 404,
         errorMessage: `review number ${review_id} does not exist`,
+      });
+    }
+    return true;
+  });
+};
+
+exports.checkCategoryExists = (category) => {
+  console.log("model checkCategoryExists start");
+  const queryStr = `
+  SELECT * FROM reviews WHERE category = $1;
+  `;
+  if (!category) {
+    return;
+  }
+  return connection.query(queryStr, [category]).then(({ rowCount }) => {
+    if (rowCount === 0) {
+      console.log(
+        "model checkCategoryExists found that category did not exist, return rejected promise"
+      );
+      return Promise.reject({
+        status: 400,
+        errorMessage: `category ${category} does not exist`,
       });
     }
     return true;

@@ -55,7 +55,7 @@ app.use((err, req, res, next) => {
 
 app.use((err, req, res, next) => {
   console.log("In the 500 handler");
-  // console.log(err);
+  console.log(err);
   res.status(500).send({ msg: "something went wrong" });
 });
 
