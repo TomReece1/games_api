@@ -3,6 +3,7 @@ const request = require("supertest");
 const connection = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
+require("jest-sorted");
 
 beforeEach(() => seed(data));
 
@@ -79,7 +80,7 @@ describe("app", () => {
     });
 
     describe("GET /api/reviews", () => {
-      test("status:200 and returns an object with key reviews and a value of an array of review objects", () => {
+      test("status:200 and returns an object with key reviews and a value of an array of review objects in descending date order", () => {
         return request(app)
           .get("/api/reviews")
           .expect(200)
@@ -101,6 +102,9 @@ describe("app", () => {
                   })
                 );
                 expect(isNaN(+review.comment_count)).toBe(false);
+              });
+              expect(body.reviews).toBeSortedBy("created_at", {
+                descending: true,
               });
             } else {
               expect(body.reviews).toEqual([]);
