@@ -3,6 +3,7 @@ const {
   updateReviewById,
   fetchReviews,
   fetchCommentsByReviewId,
+  checkReviewExists,
 } = require("../models/reviews.m");
 
 exports.getReviewById = (req, res, next) => {
@@ -40,9 +41,12 @@ exports.getReviews = (req, res, next) => {
 
 exports.getCommentsByReviewId = (req, res, next) => {
   const { review_id } = req.params;
-  fetchCommentsByReviewId(review_id)
-    .then((comments) => {
-      res.status(200).send({ comments });
+  return Promise.all([
+    fetchCommentsByReviewId(review_id),
+    checkReviewExists(review_id),
+  ])
+    .then((results) => {
+      res.status(200).send({ comments: results[0] });
     })
     .catch((err) => {
       next(err);
