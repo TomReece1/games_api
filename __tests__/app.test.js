@@ -188,6 +188,55 @@ describe("app", () => {
           });
       });
     });
+
+    describe("GET /api/reviews/:review_id/comments", () => {
+      test("status:200 returns array of comment objects when passed a valid review_id with at least 1 comment", () => {
+        return request(app)
+          .get("/api/reviews/2/comments")
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).toHaveLength(3);
+            comments.forEach((comment) => {
+              expect(comment).toEqual(
+                expect.objectContaining({
+                  comment_id: expect.any(Number),
+                  body: expect.any(String),
+                  review_id: expect.any(Number),
+                  author: expect.any(String),
+                  votes: expect.any(Number),
+                  created_at: expect.any(String),
+                })
+              );
+            });
+          });
+      });
+      test("status:200 returns an empty array when passed a valid review_id with 0 comments", () => {
+        return request(app)
+          .get("/api/reviews/1/comments")
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).toEqual([]);
+          });
+      });
+
+      test("status:404 when requested review_id is a number but doesn't exist", () => {
+        return request(app)
+          .get("/api/reviews/999/comments")
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("review number 999 does not exist");
+          });
+      });
+
+      test("status:400 when requested review_id is not of type number", () => {
+        return request(app)
+          .get("/api/reviews/invalid/comments")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("review_id must be a number");
+          });
+      });
+    });
   });
 
   describe("users", () => {
