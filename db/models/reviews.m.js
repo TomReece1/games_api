@@ -103,7 +103,46 @@ exports.fetchCommentsByReviewId = (review_id) => {
     });
 };
 
+exports.insertCommentToReviewId = (body, review_id, username) => {
+  console.log("model insertCommentToReviewId start");
+  if (isNaN(+review_id)) {
+    return Promise.reject({
+      status: 400,
+      errorMessage: `review_id must be a number`,
+    });
+  }
+  if (typeof body !== "string" || typeof username !== "string") {
+    return Promise.reject({
+      status: 422,
+      errorMessage: "something wrong with the request information provided",
+    });
+  }
+  return connection
+    .query(
+      `
+      INSERT INTO comments
+      (body, review_id, author)
+      VALUES
+      ($1, $2, $3)
+      RETURNING *;
+      `,
+      [body, review_id, username]
+    )
+    .then(({ rows }) => {
+      console.log("model insertCommentToReviewId then block starts");
+      // if (rowCount === 0) {
+      //   return Promise.reject({
+      //     status: 404,
+      //     errorMessage: `review number ${review_id} does not exist`,
+      //   });
+      // } else {
+      return rows[0];
+      // }
+    });
+};
+
 exports.checkReviewExists = (review_id) => {
+  console.log("model checkReviewExists start");
   const queryStr = `
   SELECT * FROM reviews WHERE review_id = $1;
   `;
@@ -112,6 +151,9 @@ exports.checkReviewExists = (review_id) => {
   }
   return connection.query(queryStr, [review_id]).then(({ rowCount }) => {
     if (rowCount === 0) {
+      console.log(
+        "model checkReviewExists found that review did not exist, return rejected promise"
+      );
       return Promise.reject({
         status: 404,
         errorMessage: `review number ${review_id} does not exist`,
