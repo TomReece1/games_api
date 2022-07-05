@@ -3,6 +3,7 @@ const request = require("supertest");
 const connection = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
+require("jest-sorted");
 
 beforeEach(() => seed(data));
 
@@ -74,6 +75,40 @@ describe("app", () => {
           .expect(400)
           .then(({ body }) => {
             expect(body.msg).toBe("review_id must be a number");
+          });
+      });
+    });
+
+    describe("GET /api/reviews", () => {
+      test("status:200 and returns an object with key reviews and a value of an array of review objects in descending date order", () => {
+        return request(app)
+          .get("/api/reviews")
+          .expect(200)
+          .then(({ body }) => {
+            if (body.reviews.length > 0) {
+              body.reviews.forEach((review) => {
+                expect(review).toEqual(
+                  expect.objectContaining({
+                    review_id: expect.any(Number),
+                    title: expect.any(String),
+                    category: expect.any(String),
+                    designer: expect.any(String),
+                    owner: expect.any(String),
+                    review_body: expect.any(String),
+                    review_img_url: expect.any(String),
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+                    comment_count: expect.any(String),
+                  })
+                );
+                expect(isNaN(+review.comment_count)).toBe(false);
+              });
+              expect(body.reviews).toBeSortedBy("created_at", {
+                descending: true,
+              });
+            } else {
+              expect(body.reviews).toEqual([]);
+            }
           });
       });
     });
