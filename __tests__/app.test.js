@@ -302,35 +302,6 @@ describe("app", () => {
           });
       });
 
-      test.only("status:201 all rows that were on comments table remain on", () => {
-        let startingCommentsArr = undefined;
-        let finalCommentsArr = undefined;
-
-        return request(app)
-          .get("/api/reviews/2/comments")
-          .expect(200)
-          .then(({ body: { comments } }) => {
-            startingCommentsArr = comments;
-            return request(app)
-              .post("/api/reviews/2/comments")
-              .send(validReqBody)
-              .expect(201)
-              .then(() => {
-                return request(app)
-                  .get("/api/reviews/2/comments")
-                  .expect(200)
-                  .then(({ body: { comments } }) => {
-                    finalCommentsArr = comments;
-                    // console.log(startingCommentsArr, finalCommentsArr);
-                    console.log(startingCommentsArr);
-                    expect(finalCommentsArr).toEqual(
-                      startingCommentsArr.push(validReqBody)
-                    );
-                  });
-              });
-          });
-      });
-
       test("status:404 when review_id is a number that doesn't exist", () => {
         return request(app)
           .post("/api/reviews/999/comments")
