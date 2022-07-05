@@ -237,6 +237,137 @@ describe("app", () => {
           });
       });
     });
+
+    describe("POST /api/reviews/:review_id/comments", () => {
+      const validReqBody = {
+        username: "mallionaire",
+        body: "Apt analysis, Robert",
+      };
+      const invalidReqBodyValueType = {
+        username: 3,
+        body: "Apt analysis, Robert",
+      };
+      const invalidReqBodyWrongKeys = {
+        username: "mallionaire",
+        text: "Apt analysis, Robert",
+      };
+      const invalidReqBodyMissingKey = {
+        username: "mallionaire",
+      };
+      const invalidReqBodyUsername = {
+        username: "tomreece1",
+        body: "Apt analysis, Robert",
+      };
+      test("status:201 responds with the posted comment when review_id and req body are valid", () => {
+        return request(app)
+          .post("/api/reviews/1/comments")
+          .send(validReqBody)
+          .expect(201)
+          .then(({ body: { comment } }) => {
+            expect(comment).toEqual(
+              expect.objectContaining({
+                comment_id: 7,
+                body: "Apt analysis, Robert",
+                review_id: 1,
+                author: "mallionaire",
+                votes: 0,
+                created_at: expect.any(String),
+              })
+            );
+          });
+      });
+
+      test("status:201 length of comments table becomes 1 more", () => {
+        let startingComments = undefined;
+        let finalComments = undefined;
+
+        return request(app)
+          .get("/api/reviews/2/comments")
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            startingComments = comments.length;
+            return request(app)
+              .post("/api/reviews/2/comments")
+              .send(validReqBody)
+              .expect(201)
+              .then(() => {
+                return request(app)
+                  .get("/api/reviews/2/comments")
+                  .expect(200)
+                  .then(({ body: { comments } }) => {
+                    finalComments = comments.length;
+                    expect(finalComments).toBe(startingComments + 1);
+                  });
+              });
+          });
+      });
+
+      test("status:404 when review_id is a number that doesn't exist", () => {
+        return request(app)
+          .post("/api/reviews/999/comments")
+          .send(validReqBody)
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("request does not exist");
+          });
+      });
+
+      test("status:400 when review_id is not of type number", () => {
+        return request(app)
+          .post("/api/reviews/invalid/comments")
+          .send(validReqBody)
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("review_id must be a number");
+          });
+      });
+
+      test("status:422 when request body values are wrong type", () => {
+        return request(app)
+          .post("/api/reviews/1/comments")
+          .send(invalidReqBodyValueType)
+          .expect(422)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe(
+              "something wrong with the request information provided"
+            );
+          });
+      });
+
+      test("status:422 when request body keys are wrong strings", () => {
+        return request(app)
+          .post("/api/reviews/1/comments")
+          .send(invalidReqBodyWrongKeys)
+          .expect(422)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe(
+              "something wrong with the request information provided"
+            );
+          });
+      });
+
+      test("status:422 when request body is missing a key", () => {
+        return request(app)
+          .post("/api/reviews/1/comments")
+          .send(invalidReqBodyMissingKey)
+          .expect(422)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe(
+              "something wrong with the request information provided"
+            );
+          });
+      });
+
+      test("status:404 when request body has a username that is a string but isn't on users table", () => {
+        return request(app)
+          .post("/api/reviews/1/comments")
+          .send(invalidReqBodyUsername)
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("request does not exist");
+          });
+      });
+    });
   });
 
   describe("users", () => {

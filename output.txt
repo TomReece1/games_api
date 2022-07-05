@@ -1,5 +1,1 @@
-You are now connected to database "nc_games_test" as user "tomreece".
- comment_id | body | review_id | author | votes | created_at 
-------------+------+-----------+--------+-------+------------
-(0 rows)
-
+You are now connected to database "nc_games" as user "tomreece".
