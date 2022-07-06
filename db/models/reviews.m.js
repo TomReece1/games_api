@@ -82,13 +82,6 @@ exports.fetchReviews = (sort_by = "created_at", order = "desc", category) => {
 
   const validOrderOptions = ["asc", "desc"];
 
-  //This will have to be changed later, what if lots more categories are added later?
-  //Can't remember what the solution was but it will be in my notes
-  //How else could we validate a string to see if it exist on the category column
-  //A util function? we already made a function that checks if review_id exists
-  //Make another function that checks if category exists
-  const validCategoryOptions = [undefined, "dexterity", "social deduction"];
-
   if (!validSortOptions.includes(sort_by)) {
     return Promise.reject({
       status: 400,
@@ -98,28 +91,11 @@ exports.fetchReviews = (sort_by = "created_at", order = "desc", category) => {
   if (!validOrderOptions.includes(order)) {
     return Promise.reject({ status: 400, errorMessage: "Invalid order query" });
   }
-  if (!validCategoryOptions.includes(category)) {
-    return Promise.reject({
-      status: 400,
-      errorMessage: "Invalid category query",
-    });
-  }
 
   let whereStr = "";
   if (category) {
     whereStr = `WHERE reviews.category = '${category}'`;
   }
-
-  // console.log("this.checkCategoryExists(category)");
-  // console.log(this.checkCategoryExists(category));
-  // return this.checkCategoryExists(category).then(
-
-  // if (category && !this.checkCategoryExists(category)) {
-  //   return Promise.reject({
-  //     status: 400,
-  //     errorMessage: "Invalid category query",
-  //   });
-  // }
 
   return connection
     .query(
@@ -132,7 +108,11 @@ exports.fetchReviews = (sort_by = "created_at", order = "desc", category) => {
   `
     )
     .then(({ rows }) => {
-      console.log("query worked");
+      if (category) {
+        return this.checkCategoryExists(category).then(() => {
+          return rows;
+        });
+      }
       return rows;
     });
 };
@@ -159,7 +139,6 @@ exports.fetchCommentsByReviewId = (review_id) => {
 };
 
 exports.insertCommentToReviewId = (body, review_id, username) => {
-  console.log("model insertCommentToReviewId start");
   if (isNaN(+review_id)) {
     return Promise.reject({
       status: 400,
@@ -184,20 +163,11 @@ exports.insertCommentToReviewId = (body, review_id, username) => {
       [body, review_id, username]
     )
     .then(({ rows }) => {
-      console.log("model insertCommentToReviewId then block starts");
-      // if (rowCount === 0) {
-      //   return Promise.reject({
-      //     status: 404,
-      //     errorMessage: `review number ${review_id} does not exist`,
-      //   });
-      // } else {
       return rows[0];
-      // }
     });
 };
 
 exports.checkReviewExists = (review_id) => {
-  console.log("model checkReviewExists start");
   const queryStr = `
   SELECT * FROM reviews WHERE review_id = $1;
   `;
@@ -206,9 +176,6 @@ exports.checkReviewExists = (review_id) => {
   }
   return connection.query(queryStr, [review_id]).then(({ rowCount }) => {
     if (rowCount === 0) {
-      console.log(
-        "model checkReviewExists found that review did not exist, return rejected promise"
-      );
       return Promise.reject({
         status: 404,
         errorMessage: `review number ${review_id} does not exist`,
@@ -219,7 +186,6 @@ exports.checkReviewExists = (review_id) => {
 };
 
 exports.checkCategoryExists = (category) => {
-  console.log("model checkCategoryExists start");
   const queryStr = `
   SELECT * FROM reviews WHERE category = $1;
   `;
@@ -228,11 +194,8 @@ exports.checkCategoryExists = (category) => {
   }
   return connection.query(queryStr, [category]).then(({ rowCount }) => {
     if (rowCount === 0) {
-      console.log(
-        "model checkCategoryExists found that category did not exist, return rejected promise"
-      );
       return Promise.reject({
-        status: 400,
+        status: 404,
         errorMessage: `category ${category} does not exist`,
       });
     }

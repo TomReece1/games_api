@@ -378,7 +378,7 @@ describe("app", () => {
     //sort by a string that isn't valid
     //order by a string that isn't valid
     //filter by a string that isn't valid
-    describe.only("GET /api/reviews queries", () => {
+    describe("GET /api/reviews queries", () => {
       test("200 accepts sort_by query with any column, descending by default", () => {
         return request(app)
           .get("/api/reviews?sort_by=title")
@@ -440,15 +440,13 @@ describe("app", () => {
             expect(msg).toBe("Invalid order query");
           });
       });
-      //Not working because we do checkCategoryExists inside fetchReviews
-      //But it's asynchronous
-      //I think I have to get the promise to resolve before continuing
-      test("400 for an invalid category query option", () => {
+
+      test("404 for a category query option that doesn't exist", () => {
         return request(app)
           .get("/api/reviews?category=invalid")
-          .expect(400)
+          .expect(404)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Invalid category query");
+            expect(msg).toBe("category invalid does not exist");
           });
       });
     });
