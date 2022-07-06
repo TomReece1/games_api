@@ -13,12 +13,12 @@
   
 
 
--- SELECT COUNT(comments.comments.body) from reviews
--- INNER JOIN comments
--- ON reviews.review_id = comments.review_id
--- WHERE reviews.review_id = 2;
+SELECT COUNT(comments.review_id) AS TOTAL_COMMENTS from comments
+LEFT JOIN reviews
+ON reviews.review_id = comments.review_id
+WHERE reviews.review_id = 2;
 
-SELECT count(comments.review_id) AS comment_count FROM comments
-      LEFT JOIN reviews ON reviews.review_id = comments.review_id
-      WHERE reviews.review_id = 2;
+-- SELECT count(comments.review_id) AS comment_count FROM comments
+--       LEFT JOIN reviews ON reviews.review_id = comments.review_id
+--       WHERE reviews.review_id = 2;
       -- GROUP BY reviews.review_id;

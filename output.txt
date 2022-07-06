@@ -1,1 +1,6 @@
-You are now connected to database "nc_games" as user "tomreece".
+You are now connected to database "nc_games_test" as user "tomreece".
+ total_comments 
+----------------
+              0
+(1 row)
+

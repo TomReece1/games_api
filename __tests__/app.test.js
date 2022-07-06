@@ -477,6 +477,37 @@ describe("app", () => {
     });
   });
 
+  describe("comments", () => {
+    describe("DELETE /api/comments/:comment_id", () => {
+      test("204 responds with no content", () => {
+        return request(app)
+          .delete("/api/comments/1")
+          .expect(204)
+          .then(({ body }) => {
+            expect(body).toEqual({});
+          });
+      });
+
+      test("404 when passed an id that is a number but doesn't exist", () => {
+        return request(app)
+          .delete("/api/comments/9999")
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("comment number 9999 does not exist");
+          });
+      });
+
+      test("400 when passed an id that is not of type number", () => {
+        return request(app)
+          .delete("/api/comments/invalid")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("comment_id must be a number");
+          });
+      });
+    });
+  });
+
   describe("General error handling", () => {
     test("Misspelled endpoints receive 404", () => {
       return request(app)
