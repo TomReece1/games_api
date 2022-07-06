@@ -31,7 +31,8 @@ exports.patchReviewById = (req, res, next) => {
 };
 
 exports.getReviews = (req, res, next) => {
-  fetchReviews()
+  const { sort_by, order, category } = req.query;
+  fetchReviews(sort_by, order, category)
     .then((reviews) => {
       res.status(200).send({ reviews });
     })
@@ -55,23 +56,14 @@ exports.getCommentsByReviewId = (req, res, next) => {
 };
 
 exports.postCommentToReviewId = (req, res, next) => {
-  console.log("controller start");
   const { review_id } = req.params;
   const { username, body } = req.body;
 
-  // return Promise.all([
   insertCommentToReviewId(body, review_id, username)
-    // ,
-    // checkReviewExists(review_id),
-    // ])
     .then((comment) => {
-      // console.log("both promises resolve");
       res.status(201).send({ comment });
     })
     .catch((err) => {
-      // console.log(
-      //   "one of the promises was rejected, err received from model is: " + err
-      // );
       next(err);
     });
 };

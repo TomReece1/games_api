@@ -67,17 +67,52 @@ exports.updateReviewById = (review_id, inc_votes) => {
     });
 };
 
-exports.fetchReviews = () => {
+exports.fetchReviews = (sort_by = "created_at", order = "desc", category) => {
+  const validSortOptions = [
+    "review_id",
+    "title",
+    "category",
+    "designer",
+    "owner",
+    "review_body",
+    "review_img_url",
+    "created_at",
+    "votes",
+  ];
+
+  const validOrderOptions = ["asc", "desc"];
+
+  if (!validSortOptions.includes(sort_by)) {
+    return Promise.reject({
+      status: 400,
+      errorMessage: "Invalid sort_by query",
+    });
+  }
+  if (!validOrderOptions.includes(order)) {
+    return Promise.reject({ status: 400, errorMessage: "Invalid order query" });
+  }
+
+  let whereStr = "";
+  if (category) {
+    whereStr = `WHERE reviews.category = '${category}'`;
+  }
+
   return connection
     .query(
       `
       SELECT reviews.*, count(comments.body) AS comment_count FROM reviews
       LEFT JOIN comments ON reviews.review_id = comments.review_id
+      ${whereStr}
       GROUP BY reviews.review_id
-      ORDER BY reviews.created_at desc;
+      ORDER BY reviews.${sort_by} ${order};
   `
     )
     .then(({ rows }) => {
+      if (category) {
+        return this.checkCategoryExists(category).then(() => {
+          return rows;
+        });
+      }
       return rows;
     });
 };
@@ -104,7 +139,6 @@ exports.fetchCommentsByReviewId = (review_id) => {
 };
 
 exports.insertCommentToReviewId = (body, review_id, username) => {
-  console.log("model insertCommentToReviewId start");
   if (isNaN(+review_id)) {
     return Promise.reject({
       status: 400,
@@ -129,20 +163,11 @@ exports.insertCommentToReviewId = (body, review_id, username) => {
       [body, review_id, username]
     )
     .then(({ rows }) => {
-      console.log("model insertCommentToReviewId then block starts");
-      // if (rowCount === 0) {
-      //   return Promise.reject({
-      //     status: 404,
-      //     errorMessage: `review number ${review_id} does not exist`,
-      //   });
-      // } else {
       return rows[0];
-      // }
     });
 };
 
 exports.checkReviewExists = (review_id) => {
-  console.log("model checkReviewExists start");
   const queryStr = `
   SELECT * FROM reviews WHERE review_id = $1;
   `;
@@ -151,12 +176,27 @@ exports.checkReviewExists = (review_id) => {
   }
   return connection.query(queryStr, [review_id]).then(({ rowCount }) => {
     if (rowCount === 0) {
-      console.log(
-        "model checkReviewExists found that review did not exist, return rejected promise"
-      );
       return Promise.reject({
         status: 404,
         errorMessage: `review number ${review_id} does not exist`,
+      });
+    }
+    return true;
+  });
+};
+
+exports.checkCategoryExists = (category) => {
+  const queryStr = `
+  SELECT * FROM reviews WHERE category = $1;
+  `;
+  if (!category) {
+    return;
+  }
+  return connection.query(queryStr, [category]).then(({ rowCount }) => {
+    if (rowCount === 0) {
+      return Promise.reject({
+        status: 404,
+        errorMessage: `category ${category} does not exist`,
       });
     }
     return true;

@@ -368,6 +368,88 @@ describe("app", () => {
           });
       });
     });
+
+    //Happy paths
+    //sort_by any column (defualts to date)
+    //order by asc/desc (defaults to desc)
+    //category (filters only the category)
+    //mix and match of multiple queries together
+    //Sad Paths
+    //sort by a string that isn't valid
+    //order by a string that isn't valid
+    //filter by a string that isn't valid
+    describe("GET /api/reviews queries", () => {
+      test("200 accepts sort_by query with any column, descending by default", () => {
+        return request(app)
+          .get("/api/reviews?sort_by=title")
+          .expect(200)
+          .then(({ body: { reviews } }) => {
+            expect(reviews).toBeSortedBy("title", { descending: true });
+          });
+      });
+      test("200 accepts sort_by query with another column, descending by default", () => {
+        return request(app)
+          .get("/api/reviews?sort_by=votes")
+          .expect(200)
+          .then(({ body: { reviews } }) => {
+            expect(reviews).toBeSortedBy("votes", { descending: true });
+          });
+      });
+      test("200 accepts order asc", () => {
+        return request(app)
+          .get("/api/reviews?order=asc")
+          .expect(200)
+          .then(({ body: { reviews } }) => {
+            expect(reviews).toBeSortedBy("created_at");
+          });
+      });
+      test("200 filters by category", () => {
+        return request(app)
+          .get("/api/reviews?category=dexterity")
+          .expect(200)
+          .then(({ body: { reviews } }) => {
+            reviews.forEach((review) => {
+              expect(review.category).toBe("dexterity");
+            });
+          });
+      });
+      test("200 all 3 queries together", () => {
+        return request(app)
+          .get("/api/reviews?sort_by=title&order=asc&category=social deduction")
+          .expect(200)
+          .then(({ body: { reviews } }) => {
+            expect(reviews).toBeSortedBy("title");
+            reviews.forEach((review) => {
+              expect(review.category).toBe("social deduction");
+            });
+          });
+      });
+      test("400 for an invalid sort_by query option", () => {
+        return request(app)
+          .get("/api/reviews?sort_by=invalid")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Invalid sort_by query");
+          });
+      });
+      test("400 for an invalid order query option", () => {
+        return request(app)
+          .get("/api/reviews?order=invalid")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Invalid order query");
+          });
+      });
+
+      test("404 for a category query option that doesn't exist", () => {
+        return request(app)
+          .get("/api/reviews?category=invalid")
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("category invalid does not exist");
+          });
+      });
+    });
   });
 
   describe("users", () => {
