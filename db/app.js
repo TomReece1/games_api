@@ -1,6 +1,7 @@
 const express = require("express");
 
 //test commit
+//test commit 2
 
 const { getCategories } = require("./controllers/categories.c.js");
 const {
