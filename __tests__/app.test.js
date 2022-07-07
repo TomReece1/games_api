@@ -508,6 +508,39 @@ describe("app", () => {
     });
   });
 
+  describe("api", () => {
+    describe("GET /api", () => {
+      test("200 returns JSON describing available endpoints", () => {
+        return request(app)
+          .get("/api")
+          .expect(200)
+          .then(({ body }) => {
+            expect(typeof body).toBe("object");
+            expect(body).toEqual(
+              expect.objectContaining({
+                "GET /api": expect.any(Object),
+                "GET /api/categories": expect.any(Object),
+                "GET /api/reviews/:review_id": expect.any(Object),
+                "PATCH /api/reviews/:review_id": expect.any(Object),
+                "GET /api/users": expect.any(Object),
+                "GET /api/reviews": expect.any(Object),
+                "GET /api/reviews/:review_id/comments": expect.any(Object),
+                "POST /api/reviews/:review_id/comments": expect.any(Object),
+                "DELETE /api/comments/:comment_id": expect.any(Object),
+              })
+            );
+            for (const endpoint in body) {
+              expect(body[endpoint]).toEqual(
+                expect.objectContaining({
+                  description: expect.any(String),
+                })
+              );
+            }
+          });
+      });
+    });
+  });
+
   describe("General error handling", () => {
     test("Misspelled endpoints receive 404", () => {
       return request(app)

@@ -10,6 +10,7 @@ const {
 } = require("./controllers/reviews.c.js");
 const { getUsers } = require("./controllers/users.c.js");
 const { deleteCommentById } = require("./controllers/comments.c.js");
+const { getApi } = require("./controllers/api.c.js");
 const app = express();
 
 app.use(express.json());
@@ -29,6 +30,8 @@ app.get("/api/reviews/:review_id/comments", getCommentsByReviewId);
 app.post("/api/reviews/:review_id/comments", postCommentToReviewId);
 
 app.delete("/api/comments/:comment_id", deleteCommentById);
+
+app.get("/api", getApi);
 
 app.use("*", (req, res) => {
   res.status(404).send({ msg: "Invalid Path" });
