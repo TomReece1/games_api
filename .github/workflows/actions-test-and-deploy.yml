@@ -4,11 +4,11 @@ push:
 branches:
   - main
 jobs:
-	greeting:
-		runs-on: ubuntu-latest
-		steps:
-  		- name: Say Hello
-				run: echo "CICD, it's dynamite"
+greeting:
+	runs-on: ubuntu-latest
+	steps:
+  	- name: Say Hello
+			run: echo "CICD, it's dynamite"
 # test:
 # runs-on: ubuntu-latest
 # steps:
