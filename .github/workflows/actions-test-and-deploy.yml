@@ -16,9 +16,9 @@ jobs:
 				postgresql password: passw0rd
 			- name: Run Integration Tests
 				run: PGDATABASE=nc_games_test PGUSER=mr_testerson PGPASSWORD=passw0rd npm test
-				deploy:
-				runs-on: ubuntu-latest
-				needs: test
+	deploy:
+		runs-on: ubuntu-latest
+		needs: test
 		steps:
 			- name: Checkout and clone repo
 				uses: actions/checkout@v2
