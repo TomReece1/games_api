@@ -5,24 +5,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "CICD, it's dynamite"
-	Test:
-		runs-on: ubuntu-latest
-		steps:
-			- name: Checkout and clone repo
-  			uses: actions/checkout@v2
-			- name: Install Dependencies
-  			run: npm install
-			- name: Setup Postgres
-				uses: harmon758/postgresql-action@v1
-				with:
-				postgresql db: nc_games_test
-				postgresql user: mr_testerson
-				postgresql password: passw0rd
-			- name: Run Integration Tests
-				run: PGDATABASE=nc_games_test PGUSER=mr_testerson PGPASSWORD=passw0rd npm test
-				deploy:
-				runs-on: ubuntu-latest
-				needs: test
+Test:
+	runs-on: ubuntu-latest
+	steps:
+		- name: Checkout and clone repo
+			uses: actions/checkout@v2
+		- name: Install Dependencies
+			run: npm install
+		- name: Setup Postgres
+			uses: harmon758/postgresql-action@v1
+			with:
+			postgresql db: nc_games_test
+			postgresql user: mr_testerson
+			postgresql password: passw0rd
+		- name: Run Integration Tests
+			run: PGDATABASE=nc_games_test PGUSER=mr_testerson PGPASSWORD=passw0rd npm test
+			deploy:
+			runs-on: ubuntu-latest
+			needs: test
 # steps:
 # - name: Checkout and clone repo
 #   uses: actions/checkout@v2
