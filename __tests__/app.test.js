@@ -384,6 +384,7 @@ describe("app", () => {
           .get("/api/reviews?sort_by=title")
           .expect(200)
           .then(({ body: { reviews } }) => {
+            console.log(reviews);
             expect(reviews).toBeSortedBy("title", { descending: true });
           });
       });
