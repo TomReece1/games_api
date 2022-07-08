@@ -20,7 +20,9 @@ app.use(express.json());
 app.use("/api", apiRouter);
 
 app.use("*", (req, res) => {
-  res.status(404).send({ msg: "Invalid Path" });
+  res
+    .status(404)
+    .send({ msg: "Invalid Path - now with 200% extra github actions!" });
 });
 
 app.use((err, req, res, next) => {
