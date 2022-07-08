@@ -5,8 +5,6 @@ exports.getApi = (req, res, next) => {
   fetchApi()
     .then((result) => {
       console.log("result was returned to controller");
-      // console.log(result);
-      // console.log(typeof JSON.parse(result));
       const parsedResult = JSON.parse(result);
       res.status(200).send(parsedResult);
     })
