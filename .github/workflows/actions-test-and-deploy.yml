@@ -1,14 +1,8 @@
 name: Test and Deploy
-
-on:
-push:
-branches:
-  - main
-
+on: [push]
 jobs:
-greeting:
-runs-on: macOS-latest
-
-steps:
-  - name: Say Hello
-run: echo "CICD, it's dynamite"
+  Greeting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Say Hello
+      - run: echo "CICD, it's dynamite"
