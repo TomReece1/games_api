@@ -1,11 +1,14 @@
 name: Test and Deploy
+
 on:
 push:
 branches:
   - main
+
 jobs:
 greeting:
 runs-on: macOS-latest
+
 steps:
   - name: Say Hello
 run: echo "CICD, it's dynamite"
