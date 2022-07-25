@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 
 const { getCategories } = require("./controllers/categories.c.js");
 const {
@@ -14,6 +15,8 @@ const { getApi } = require("./controllers/api.c.js");
 const app = express();
 
 const apiRouter = require("../routes/api-router");
+
+app.use(cors());
 
 app.use(express.json());
 
