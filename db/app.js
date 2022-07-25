@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-//test commit
+//test commit 2
 
 const { getCategories } = require("./controllers/categories.c.js");
 const {
