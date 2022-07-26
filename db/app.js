@@ -37,6 +37,7 @@ app.use((err, req, res, next) => {
 
 app.use((err, req, res, next) => {
   if (err.code) {
+    console.log(err);
     res.status(404).send({ msg: "request does not exist" });
   } else {
     next(err);
