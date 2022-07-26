@@ -388,6 +388,15 @@ describe("app", () => {
             expect(reviews).toBeSortedBy("title", { descending: true });
           });
       });
+      test.skip("200 accepts sort_by query with comment_count, descending by default", () => {
+        return request(app)
+          .get("/api/reviews?sort_by=comment_count")
+          .expect(200)
+          .then(({ body: { reviews } }) => {
+            console.log(reviews);
+            expect(reviews).toBeSortedBy("title", { descending: true });
+          });
+      });
       test("200 accepts sort_by query with another column, descending by default", () => {
         return request(app)
           .get("/api/reviews?sort_by=votes")

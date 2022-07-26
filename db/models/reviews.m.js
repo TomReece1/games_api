@@ -101,7 +101,7 @@ exports.fetchReviews = (sort_by = "created_at", order = "desc", category) => {
   return connection
     .query(
       `
-      SELECT reviews.*, count(comments.body) AS comment_count FROM reviews
+      SELECT reviews.* , count(comments.body) AS comment_count FROM reviews
       LEFT JOIN comments ON reviews.review_id = comments.review_id
       ${whereStr}
       GROUP BY reviews.review_id
